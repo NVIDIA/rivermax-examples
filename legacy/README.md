@@ -6,3 +6,4 @@ This directory contains sample applications that demonstrate the usage of NVIDIA
 ## Applications
 
 - [generic_receiver](./generic_receiver/) - a receiver (RX) demo application that demonstrates receiving generic data streams using the Rivermax API.
+- [rivermax_player](./rivermax_player/) - a transmitter (TX) application that demonstrates sending professional media streams (video, audio, and ancillary data) using the Rivermax API.

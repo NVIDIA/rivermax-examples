@@ -13,20 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-project(rivermax-legacy
-    VERSION 1.0.0
-    DESCRIPTION "Legacy Rivermax applications and services"
-    HOMEPAGE_URL https://github.com/NVIDIA/rivermax-examples/tree/main/legacy
-    LANGUAGES CXX C
+add_executable(rivermax_player)
+
+# TODO: Fix the deprecated warnings and remove this script-block
+if (MSVC)
+    target_compile_options(rivermax_player PRIVATE /wd4996)
+else()
+    target_compile_options(rivermax_player PRIVATE -Wno-deprecated-declarations)
+endif()
+
+target_include_directories(rivermax_player PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_sources(rivermax_player
+    PRIVATE
+        rivermax_player.cpp
 )
 
-add_subdirectory(services)
+include(FetchFFmpeg)
+find_package(FFmpeg REQUIRED)
 
-set(RMAX_LEGACY_EXAMPLES
-    generic_receiver
-    rivermax_player
-)
+find_package(Rivermax 1.51.6 REQUIRED)
 
-foreach(example_dir ${RMAX_LEGACY_EXAMPLES})
-    add_subdirectory(${example_dir})
-endforeach()
+target_link_libraries(rivermax_player PRIVATE rivermax-dev-kit rivermax-app-services FFmpeg::FFmpeg)
