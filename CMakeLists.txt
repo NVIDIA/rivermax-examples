@@ -15,6 +15,9 @@
 
 cmake_minimum_required(VERSION 3.17)
 
+# Build Options
+set(RMAX_APP_LISTS "api_demo" "legacy" CACHE STRING "Lists of applications to configure for build.")
+
 if (NOT TARGET rivermax-dev-kit)
     cmake_policy(PUSH)
     cmake_policy(SET CMP0135 NEW)
@@ -38,4 +41,10 @@ project(rivermax-examples
     LANGUAGES CXX C
 )
 
-add_subdirectory(legacy)
+foreach(dir_name ${RMAX_APP_LISTS})
+    if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${dir_name}")
+        add_subdirectory(${dir_name})
+    else()
+        message(FATAL_ERROR "Subdirectory '${dir_name}' with the applications not found.")
+    endif()
+endforeach()

@@ -13,6 +13,7 @@ This repository provides practical examples demonstrating how to leverage Riverm
 
 ## Repository Structure
 
+- [api_demo/](./api_demo/) - Simple straightforward applications demonstrating the direct usage of Rivermax API
 - [legacy/](./legacy/) - Legacy applications demonstrating more complex Rivermax capabilities
 
 ## Development Kit Integration
@@ -37,6 +38,18 @@ Please follow the guidelines provided in [README of rivermax-dev-kit](https://gi
 The repository relies on [CMake](https://cmake.org/) to build binaries, and it can be built both on Linux and Windows.  
 On how to build these examples using CMake, please follow the guidelines provided in
 [README of rivermax-dev-kit](https://github.com/NVIDIA/rivermax-dev-kit?tab=readme-ov-file#building) 
+
+#### Building Specific Categories
+
+One can filter out categories of applications completely, 
+by selecting only the needed ones during the configuration command line e.g.,:
+
+```sh
+cmake -B <build-dir> -DRMAX_APP_LISTS="api_demo"
+```
+
+>[!NOTE]
+>By default, if `RMAX_APP_LISTS` is not specified, all apps are configured to be built.
 
 #### Building Specific Applications
 

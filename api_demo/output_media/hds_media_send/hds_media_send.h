@@ -1,0 +1,46 @@
+/*
+ * SPDX-FileCopyrightText: Copyright (c) 2024-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#ifndef API_DEMO_OUTPUT_MEDIA_HDS_MEDIA_SEND_H_
+#define API_DEMO_OUTPUT_MEDIA_HDS_MEDIA_SEND_H_
+
+#include "output_media_base.h"
+#include "rdk/rivermax_dev_kit.h"
+
+using namespace rivermax::dev_kit::services;
+
+
+constexpr const char* APP_DESCRIPTION = "NVIDIA Rivermax API Media Send Demo App With Header Data Split";
+constexpr const char* APP_EXAMPLES = \
+    "Examples:\n"
+    "  1. rmx_hds_media_send_demo_app --local-ip 1.2.3.4\n"
+    "  2. rmx_hds_media_send_demo_app --local-ip 1.2.3.4 --dst-ip 231.1.2.3 --dst-port 60000";
+
+/**
+ * @brief Rivermax API Media Send Demo Application With Header Data Split.
+ *
+ * This application demonstrates the usage of the Rivermax Media Send API with Header Data Split functionality.
+ */
+class RmxHDSMediaSendDemoApp : public RmxOutMediaAPIBaseDemoApp
+{
+public:
+    RmxHDSMediaSendDemoApp() : RmxOutMediaAPIBaseDemoApp(APP_DESCRIPTION, APP_EXAMPLES) {}
+    virtual ~RmxHDSMediaSendDemoApp() = default;
+protected:
+    virtual ReturnStatus operator()() override;
+};
+
+#endif // API_DEMO_OUTPUT_MEDIA_HDS_MEDIA_SEND_H_

@@ -1,0 +1,46 @@
+/*
+ * SPDX-FileCopyrightText: Copyright (c) 2024-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#ifndef API_DEMO_INPUT_RECEIVE_H_
+#define API_DEMO_INPUT_RECEIVE_H_
+
+#include "input_base.h"
+#include "rdk/rivermax_dev_kit.h"
+
+using namespace rivermax::dev_kit::services;
+
+
+constexpr const char* APP_DESCRIPTION = "NVIDIA Rivermax API Receive Demo App";
+constexpr const char* APP_EXAMPLES = \
+    "Examples:\n"
+    "  1. rmx_receive_demo_app --local-ip 1.2.3.4\n"
+    "  2. rmx_receive_demo_app --local-ip 1.2.3.4 --dst-ip 231.1.2.3 --dst-port 60000";
+
+/**
+ * @brief Basic Rivermax API Receive Demo Application.
+ *
+ * This application demonstrates the most basic usage of the Rivermax Receive API functionality.
+ */
+class RmxReceiveDemoApp : public RmxInAPIBaseDemoApp
+{
+public:
+    RmxReceiveDemoApp() : RmxInAPIBaseDemoApp(APP_DESCRIPTION, APP_EXAMPLES) {}
+    virtual ~RmxReceiveDemoApp() = default;
+protected:
+    virtual ReturnStatus operator()() override;
+};
+
+#endif // API_DEMO_INPUT_RECEIVE_H_
