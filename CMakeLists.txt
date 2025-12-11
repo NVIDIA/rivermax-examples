@@ -22,11 +22,13 @@ if (NOT TARGET rivermax-dev-kit)
     cmake_policy(PUSH)
     cmake_policy(SET CMP0135 NEW)
 
+    set(RDK_GIT_HASH "8b88d4b1f4949c4e6fcf8997cefcc443bca8cb74")
+
     include(FetchContent)
     message(STATUS "Fetching rivermax-dev-kit")
     FetchContent_Declare(
         rivermax-dev-kit
-        URL https://github.com/NVIDIA/rivermax-dev-kit/archive/refs/heads/main.zip
+        URL https://github.com/NVIDIA/rivermax-dev-kit/archive/${RDK_GIT_HASH}.zip
     )
     FetchContent_MakeAvailable(rivermax-dev-kit)
     cmake_policy(POP)
