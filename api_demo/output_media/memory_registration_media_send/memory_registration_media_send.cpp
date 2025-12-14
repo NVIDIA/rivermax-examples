@@ -139,7 +139,7 @@ ReturnStatus RmxMemoryRegistrationMediaSendDemoApp::operator()()
         rmx_output_media_set_idx_in_sdp(&streams_params[index], m_video_settings->sdp_media_block_index);
         rmx_output_media_set_packets_per_chunk(&streams_params[index], m_video_settings->packets_in_chunk);
         rmx_output_media_set_stride_size(&streams_params[index], sub_block_id, data_stride_size);
-        rmx_output_media_set_packets_per_frame(&streams_params[index], m_video_settings->packets_in_frame_field);
+        rmx_output_media_set_packets_per_frame(&streams_params[index], m_video_settings->packets_in_media_unit);
 
         /** Create the stream **/
         status = rmx_output_media_create_stream(&streams_params[index], &streams_id[index]);
@@ -160,12 +160,12 @@ ReturnStatus RmxMemoryRegistrationMediaSendDemoApp::operator()()
     uint64_t sent_mem_block_counter = 0;
     auto get_send_time_ns = [&]() { return static_cast<uint64_t>(
         start_send_time_ns
-        + m_video_settings->frame_field_time_interval_ns
-        * m_video_settings->frames_fields_in_mem_block
+        + m_video_settings->media_unit_time_interval_ns
+        * m_video_settings->media_units_in_mem_block
         * sent_mem_block_counter);
     };
     uint64_t commit_timestamp_ns = 0;
-    uint64_t chunk_in_frame_counter = 0;
+    uint64_t chunk_in_media_unit_counter = 0;
 
     /* Initialize chunk handle */
     std::vector<rmx_output_media_chunk_handle> chunk_handles(num_of_streams);
@@ -178,13 +178,13 @@ ReturnStatus RmxMemoryRegistrationMediaSendDemoApp::operator()()
 
     uint16_t* payload_sizes_ptr = nullptr;
     uint8_t* payload_ptr = nullptr;
-    auto first_chunk_in_frame = false;
+    auto first_chunk_in_media_unit = false;
 
     while (likely(status == RMX_OK && SignalHandler::get_received_signal() < 0)) {
-        chunk_in_frame_counter = 0;
+        chunk_in_media_unit_counter = 0;
         send_time_ns = get_send_time_ns();
 
-        /** Prepare and send a frame **/
+        /** Prepare and send a media unit **/
         do {
             for (auto& chunk_handle : chunk_handles) {
                 /*** Get the next chunk to send ***/
@@ -205,15 +205,15 @@ ReturnStatus RmxMemoryRegistrationMediaSendDemoApp::operator()()
                 NOT_IN_USE(payload_ptr);
 
                 /*** Commit the chunk ***/
-                first_chunk_in_frame = unlikely(chunk_in_frame_counter % m_video_settings->chunks_in_frame_field == 0);
-                commit_timestamp_ns = first_chunk_in_frame ? send_time_ns : 0;
+                first_chunk_in_media_unit = unlikely(chunk_in_media_unit_counter % m_video_settings->chunks_in_media_unit == 0);
+                commit_timestamp_ns = first_chunk_in_media_unit ? send_time_ns : 0;
                 do {
                     status = rmx_output_media_commit_chunk(&chunk_handle, commit_timestamp_ns);
                 } while (unlikely(status == RMX_HW_SEND_QUEUE_IS_FULL));
                 EXIT_ON_FAILURE_WITH_CLEANUP(status, "Failed to commit chunk");
             }
 
-        } while (likely(status == RMX_OK && ++chunk_in_frame_counter < m_video_settings->chunks_in_frame_field));
+        } while (likely(status == RMX_OK && ++chunk_in_media_unit_counter < m_video_settings->chunks_in_media_unit));
         sent_mem_block_counter++;
     }
 

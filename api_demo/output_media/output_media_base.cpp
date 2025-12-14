@@ -43,13 +43,13 @@ void RmxOutMediaAPIBaseDemoApp::post_cli_parse_initialization()
 
     s->num_of_total_streams = 1;
 
-    m_video_settings->resolution = Resolution{FHD_WIDTH, FHD_HEIGHT};
+    m_video_settings->resolution = Resolution{_1080_WIDTH, _1080_HEIGHT};
     m_video_settings->frame_rate = {60, 1};
     m_video_settings->sampling_type = VideoSampling::YCbCr_4_2_2;
     m_video_settings->bit_depth = VideoBitDepth::_10;
     m_video_settings->video_scan_type = VideoScanType::Progressive;
     m_video_settings->sample_rate = 90000;
-    m_video_settings->frames_fields_in_mem_block = 1;
+    m_video_settings->media_units_in_mem_block = 1;
 
     m_video_settings->media_settings_calculator = IMediaSettingsCalculatorFactory::get_media_settings_calculator(*m_video_settings);
     if (!m_video_settings->media_settings_calculator) {
