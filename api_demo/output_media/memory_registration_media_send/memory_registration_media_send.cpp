@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2024-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * SPDX-FileCopyrightText: Copyright (c) 2024-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,10 +63,10 @@ ReturnStatus RmxMemoryRegistrationMediaSendDemoApp::operator()()
     auto mem_utils = mem_allocator->get_memory_utils();
     auto mem_alignment = get_cache_line_size();
 
-    const size_t data_stride_size = align_up_pow2(m_video_settings->packet_payload_size, get_cache_line_size());
-    size_t stream_block_memory_size = m_video_settings->chunks_in_mem_block *
-        m_video_settings->packets_in_chunk * data_stride_size;
-    size_t total_size_in_bytes = num_of_streams * m_video_settings->requested_num_of_mem_blocks * stream_block_memory_size;
+    const size_t data_stride_size = align_up_pow2(m_media_settings->packet_payload_size, get_cache_line_size());
+    size_t stream_block_memory_size = m_media_settings->chunks_in_mem_block *
+        m_media_settings->packets_in_chunk * data_stride_size;
+    size_t total_size_in_bytes = num_of_streams * m_media_settings->requested_num_of_mem_blocks * stream_block_memory_size;
 
     void* allocated_mem_ptr = mem_allocator->allocate_aligned(total_size_in_bytes, mem_alignment);
     EXIT_ON_CONDITION_WITH_CLEANUP(allocated_mem_ptr == nullptr, "Failed to allocate memory");
@@ -76,18 +76,18 @@ ReturnStatus RmxMemoryRegistrationMediaSendDemoApp::operator()()
     /* Set memory layout */
     std::vector<std::vector<rmx_output_media_mem_block>> streams_blocks(num_of_streams);
     for(auto& mem_blocks : streams_blocks) {
-        mem_blocks.resize(m_video_settings->requested_num_of_mem_blocks);
+        mem_blocks.resize(m_media_settings->requested_num_of_mem_blocks);
         rmx_output_media_init_mem_blocks(mem_blocks.data(), mem_blocks.size());
     }
     constexpr size_t num_of_sub_blocks = 1; // Non-HDS mode
     constexpr size_t sub_block_index = 0;
 
     std::vector<uint16_t> payload_sizes(
-        m_video_settings->packets_in_mem_block, m_video_settings->packet_payload_size);
+        m_media_settings->packets_in_mem_block, m_media_settings->packet_payload_size);
     for(auto& mem_blocks : streams_blocks) {
         for (auto& block : mem_blocks) {
             rmx_output_media_set_sub_block_count(&block, num_of_sub_blocks);
-            rmx_output_media_set_chunk_count(&block, m_video_settings->chunks_in_mem_block);
+            rmx_output_media_set_chunk_count(&block, m_media_settings->chunks_in_mem_block);
             rmx_output_media_set_packet_layout(&block, sub_block_index, payload_sizes.data());
         }
     }
@@ -136,10 +136,10 @@ ReturnStatus RmxMemoryRegistrationMediaSendDemoApp::operator()()
         rmx_output_media_init(&streams_params[index]);
         rmx_output_media_assign_mem_blocks(&streams_params[index], streams_blocks[index].data(), streams_blocks[index].size());
         rmx_output_media_set_sdp(&streams_params[index], m_app_settings->media.sdp.c_str());
-        rmx_output_media_set_idx_in_sdp(&streams_params[index], m_video_settings->sdp_media_block_index);
-        rmx_output_media_set_packets_per_chunk(&streams_params[index], m_video_settings->packets_in_chunk);
+        rmx_output_media_set_idx_in_sdp(&streams_params[index], m_media_settings->sdp_media_block_index);
+        rmx_output_media_set_packets_per_chunk(&streams_params[index], m_media_settings->packets_in_chunk);
         rmx_output_media_set_stride_size(&streams_params[index], sub_block_id, data_stride_size);
-        rmx_output_media_set_packets_per_frame(&streams_params[index], m_video_settings->packets_in_media_unit);
+        rmx_output_media_set_packets_per_frame(&streams_params[index], m_media_settings->packets_in_media_unit);
 
         /** Create the stream **/
         status = rmx_output_media_create_stream(&streams_params[index], &streams_id[index]);
@@ -160,8 +160,8 @@ ReturnStatus RmxMemoryRegistrationMediaSendDemoApp::operator()()
     uint64_t sent_mem_block_counter = 0;
     auto get_send_time_ns = [&]() { return static_cast<uint64_t>(
         start_send_time_ns
-        + m_video_settings->media_unit_time_interval_ns
-        * m_video_settings->media_units_in_mem_block
+        + m_media_settings->media_unit_time_interval_ns
+        * m_media_settings->media_units_in_mem_block
         * sent_mem_block_counter);
     };
     uint64_t commit_timestamp_ns = 0;
@@ -205,7 +205,7 @@ ReturnStatus RmxMemoryRegistrationMediaSendDemoApp::operator()()
                 NOT_IN_USE(payload_ptr);
 
                 /*** Commit the chunk ***/
-                first_chunk_in_media_unit = unlikely(chunk_in_media_unit_counter % m_video_settings->chunks_in_media_unit == 0);
+                first_chunk_in_media_unit = unlikely(chunk_in_media_unit_counter % m_media_settings->chunks_in_media_unit == 0);
                 commit_timestamp_ns = first_chunk_in_media_unit ? send_time_ns : 0;
                 do {
                     status = rmx_output_media_commit_chunk(&chunk_handle, commit_timestamp_ns);
@@ -213,7 +213,7 @@ ReturnStatus RmxMemoryRegistrationMediaSendDemoApp::operator()()
                 EXIT_ON_FAILURE_WITH_CLEANUP(status, "Failed to commit chunk");
             }
 
-        } while (likely(status == RMX_OK && ++chunk_in_media_unit_counter < m_video_settings->chunks_in_media_unit));
+        } while (likely(status == RMX_OK && ++chunk_in_media_unit_counter < m_media_settings->chunks_in_media_unit));
         sent_mem_block_counter++;
     }
 
