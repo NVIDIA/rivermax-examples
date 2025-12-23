@@ -35,6 +35,7 @@ set(RMAX_API_DEMO_OUTPUT_MEDIA_EXAMPLES
     memory_allocation_media_send
     memory_registration_media_send
     hds_media_send
+    dynamic_media_send
 )
 
 foreach(app_dir ${RMAX_API_DEMO_OUTPUT_MEDIA_EXAMPLES})

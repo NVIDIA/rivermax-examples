@@ -22,5 +22,6 @@ api_demo/output_media                # Rivermax Output Media API demo applicatio
 ├── media_send/                      # Rivermax Output Media API basic send demo application
 ├── memory_allocation_media_send/    # Rivermax Output Media API memory allocation send demo application
 ├── memory_registration_media_send/  # Rivermax Output Media API memory registration send demo application
-└── hds_media_send/                  # Rivermax Output Media API header-data split send demo application
+├── hds_media_send/                  # Rivermax Output Media API header-data split send demo application
+└── dynamic_media_send/              # Rivermax Output Media API dynamic ancillary send demo application
 ```
