@@ -120,8 +120,6 @@ ReturnStatus RmxHDSMediaSendDemoApp::operator()()
 
     /* Data path loop */
 
-    uint16_t* header_sizes_ptr = nullptr;
-    uint16_t* payload_sizes_ptr = nullptr;
     uint8_t* header_ptr = nullptr;
     uint8_t* payload_ptr = nullptr;
     auto first_chunk_in_media_unit = false;
@@ -139,19 +137,14 @@ ReturnStatus RmxHDSMediaSendDemoApp::operator()()
             EXIT_ON_FAILURE_WITH_CLEANUP(status, "Failed to get next chunk");
 
             /*** Prepare chunk's data ***/
-            header_sizes_ptr = rmx_output_media_get_chunk_packet_sizes(&chunk_handle, header_sub_block_id);
             header_ptr = reinterpret_cast<uint8_t*>(rmx_output_media_get_chunk_strides(&chunk_handle, header_sub_block_id));
-
-            payload_sizes_ptr = rmx_output_media_get_chunk_packet_sizes(&chunk_handle, payload_sub_block_id);
             payload_ptr = reinterpret_cast<uint8_t*>(rmx_output_media_get_chunk_strides(&chunk_handle, payload_sub_block_id));
 
             /**
              * @note Fill the chunk with RTP headers and media payload based on SMPTE 2110 standards.
              * For this example, we skip this step.
              */
-            NOT_IN_USE(header_sizes_ptr);
             NOT_IN_USE(header_ptr);
-            NOT_IN_USE(payload_sizes_ptr);
             NOT_IN_USE(payload_ptr);
 
             /*** Commit the chunk ***/
