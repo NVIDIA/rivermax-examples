@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2024-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * SPDX-FileCopyrightText: Copyright (c) 2024-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -154,7 +154,7 @@ enum eMediaType_t {
     audio = (1 << 2),
 };
 
-uint32_t stream_type = eMediaType_t::ancillary |
+uint32_t enabled_media_types = eMediaType_t::ancillary |
                        eMediaType_t::audio |
                        eMediaType_t::video;
 
@@ -2788,26 +2788,26 @@ int main(int argc, char *argv[])
     app.add_flag("--assert-mc_addr", assert_mc_addr, "Check that MC IP address in the range 224.0.2.0 - 239.255.255.255");
     CLI11_PARSE(app, argc, argv);
     if (app.count("-p") > 0) {
-        stream_type = 0;
+        enabled_media_types = 0;
         if (streams_to_send.find('v') != std::string::npos) {
-            stream_type |= eMediaType_t::video;
+            enabled_media_types |= eMediaType_t::video;
             streams_to_send.erase(std::remove(streams_to_send.begin()
                                               , streams_to_send.end(), 'v'),
                                   streams_to_send.end());
         }
         if (streams_to_send.find('a') != std::string::npos) {
-            stream_type |= eMediaType_t::audio;
+            enabled_media_types |= eMediaType_t::audio;
             streams_to_send.erase(std::remove(streams_to_send.begin()
                                               , streams_to_send.end(), 'a'),
                                   streams_to_send.end());
         }
         if (streams_to_send.find('n') != std::string::npos) {
-            stream_type |= eMediaType_t::ancillary;
+            enabled_media_types |= eMediaType_t::ancillary;
             streams_to_send.erase(std::remove(streams_to_send.begin()
                                               , streams_to_send.end(), 'n'),
                                   streams_to_send.end());
         }
-        if (stream_type == 0 || !streams_to_send.empty()) {
+        if (enabled_media_types == 0 || !streams_to_send.empty()) {
             std::cerr << "invalid media type, options are a,v,n got : " << streams_to_send << std::endl;
             exit(EXIT_FAILURE);
         }
@@ -2816,7 +2816,7 @@ int main(int argc, char *argv[])
         std::cout << "Error - Number of SDP files differs from number of media files" << std::endl;
         exit(EXIT_FAILURE);
     }
-    if ((eMediaType_t::ancillary & stream_type) && !(eMediaType_t::video & stream_type)) {
+    if ((eMediaType_t::ancillary & enabled_media_types) && !(eMediaType_t::video & enabled_media_types)) {
         std::cout << "Error - Ancillary stream should be sent with video stream only" << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -2942,7 +2942,7 @@ int main(int argc, char *argv[])
         }
 
         double frame_field_start_time_ns = (double)get_tai_time_ns() + (double)nanoseconds{seconds{5}}.count();
-        if (eMediaType_t::video & stream_type) {
+        if (eMediaType_t::video & enabled_media_types) {
             //Create threads
             std::shared_ptr<my_queue> video_conv_cb = std::make_shared<my_queue>(CB_SIZE_VIDEO);
             std::shared_ptr<std::condition_variable> video_conv_cv = std::make_shared<std::condition_variable>();
@@ -3015,7 +3015,7 @@ int main(int argc, char *argv[])
 
         AudioRmaxData audio_rmax_data;
         AudioReaderData audio_reader_data;
-        if (eMediaType_t::audio & stream_type) {
+        if (eMediaType_t::audio & enabled_media_types) {
             //Audio
             if (!parse_audio_sdp_params(sdp, media_data)) {
                 std::cout << "No audio stream was found in SDP!" << std::endl;
@@ -3095,7 +3095,7 @@ int main(int argc, char *argv[])
             other_threads.emplace_back(rivermax_audio_sender, audio_rmax_data);
         }
 
-        if (eMediaType_t::ancillary & stream_type) {
+        if (eMediaType_t::ancillary & enabled_media_types) {
             if (!parse_anc_sdp_params(sdp, media_data)) {
                 std::cout << "No ancillary stream was found in SDP!" << std::endl;
                 ret = EXIT_FAILURE;
