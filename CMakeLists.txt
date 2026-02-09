@@ -22,7 +22,7 @@ if (NOT TARGET rivermax-dev-kit)
     cmake_policy(PUSH)
     cmake_policy(SET CMP0135 NEW)
 
-    set(RDK_GIT_HASH "0aadd5a0e680c4bee2c3a5abdc75be5c7a9db8ce")
+    set(RDK_GIT_HASH "154edc3da714c2dbbce0eb7a111018b13925c797")
 
     include(FetchContent)
     message(STATUS "Fetching rivermax-dev-kit")
